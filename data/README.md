@@ -2,7 +2,7 @@
 ## Data scraping
 
 
-1. Run shell script `dl.sh`
+1. Run shell script `scraping/dl.sh`
     - make sure the data directory for saving is correct
 2. move audio files to `train_audio` directory
 3. the utils in `spectrogram.py` will create spectrograms in `train/mix{i}` corresponding to mixes (below)
