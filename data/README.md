@@ -17,6 +17,8 @@ breakcore
 
 ### Mix names
 
+Overall **~1.8GB, 26hrs**
+
 ```
 - mix0: breakcore⧸dnb mix to cope with the reality.mp3
 - mix1: breakcore mix to stop thinking about your bad grades..mp3
@@ -47,3 +49,6 @@ breakcore
 - mix26: 8492 ｜ Chill Breakcore and Surge Mix #3.mp3
 - mix27: mix of underrated breakcore⧸dnb songs.mp3
 ```
+
+## TODO
+- scrape harder (for example, download all the mixes of a particular series)
