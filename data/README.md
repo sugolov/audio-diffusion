@@ -1,21 +1,54 @@
+## Data Scraping and Storage
 
-## Data scraping
+Scripts for scraping and storing breakcore music from various sources.
 
+### Scraping from YouTube:
 
-1. Run shell script `scraping/dl.sh`
-    - make sure the data directory for saving is correct
-2. move audio files to `train_audio` directory
-3. the utils in `spectrogram.py` will create spectrograms in `train/mix{i}` corresponding to mixes (below)
+1. Ensure that this is your current working directory: `audio-diffusion/data/`
+2. Append YouTube link(s) to: `./links/yt_links.txt`
+3. Run: `./dl_yt.sh`
+4. Raw MP3 data will be saved to `./training_data/raw_audio/youtube_audio/`
 
-### Data directory structure
+---
+
+### Training data directory structure
+**Note:** The `/training_data` subdirectory is gitignored in order to prevent uploading tons of training data to GitHub. This directory may exist on a local machine.
+
 ```
-breakcore
-├── train
-└── train_audio
+.
+└── training_data/
+    ├── raw_audio/
+    │   ├── youtube_audio/
+    │   │   ├── track1.mp3
+    │   │   ├── track2.mp3
+    │   │   ├── ...
+    │   │   └── track_n.mp3
+    │   └── soundcloud_audio/
+    │       ├── track1.mp3
+    │       ├── track2.mp3
+    │       ├── ...
+    │       └── track_n.mp3
+    └── processed_audio/
+        ├── youtube_processed/
+        │   ├── track1/
+        │   │   ├── spectrogram_00.npy
+        │   │   ├── spectrogram_01.npy
+        │   │   ├── ...
+        │   │   └── spectrogram_xx.npy
+        │   ├── track2/
+        │   ├── ...
+        │   └── track_n/
+        └── soundcloud_processed/
+            ├── track1/
+            │   ├── spectrogram_00.npy
+            │   ├── spectrogram_01.npy
+            │   ├── ...
+            │   └── spectrogram_xx.npy
+            ├── track2/  
+            ├── ...
+            └── track_n/
 ```
-- `train`: contains spectrograms with mixes named below
-
-### Mix names
+### Youtube Mix Names:
 
 Overall **~1.8GB, 26hrs**
 
@@ -52,3 +85,4 @@ Overall **~1.8GB, 26hrs**
 
 ## TODO
 - scrape harder (for example, download all the mixes of a particular series)
+- scraping pipeline for soundcloud
