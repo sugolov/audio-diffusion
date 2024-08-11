@@ -1,18 +1,9 @@
-## Data Scraping and Storage
+## Data Collection and Preparation
 
-Scripts for scraping and storing breakcore music from various sources.
+Scripts for scraping, storing, and processing breakcore music from the internet.
 
-### Scraping from YouTube:
-
-1. Ensure that this is your current working directory: `audio-diffusion/data/`
-2. Append YouTube link(s) to: `./links/yt_links.txt`
-3. Run: `./dl_yt.sh`
-4. Raw MP3 data will be saved to `./training_data/raw_audio/youtube_audio/`
-
----
-
-### Training data directory structure
-**Note:** The `/training_data` subdirectory is gitignored in order to prevent uploading tons of training data to GitHub. This directory may exist on a local machine.
+### Training data directory structure:
+**Note:** The following `./training_data` subdirectory is gitignored in order to prevent uploading tons of training data to GitHub. This directory should exist on a local machine / server database.
 
 ```
 .
@@ -48,41 +39,29 @@ Scripts for scraping and storing breakcore music from various sources.
             ├── ...
             └── track_n/
 ```
-### Youtube Mix Names:
 
-Overall **~1.8GB, 26hrs**
+---
 
-```
-- mix0: breakcore⧸dnb mix to cope with the reality.mp3
-- mix1: breakcore mix to stop thinking about your bad grades..mp3
-- mix2: immerse into melancholy ｜ breakcore mix.mp3
-- mix3: breakcore⧸dnb mix to study⧸let the voices rip you apart ｜ Vol. 2.mp3
-- mix4: cyberpsycho ｜ breakcore mix.mp3
-- mix5: Underground Atmospheric DnB⧸Breakcore⧸Jungle Mix.mp3
-- mix6: Ambient Dnb Mix.exe.mp3
-- mix7: OCEAN-DEEP ：： Atmospheric DnB & Jungle ：：.mp3
-- mix8: Playstation 1 nostalgia ambient atmospheric jungle drum and bass mix.mp3
-- mix9: Breakcore that'll wake you into a deep sleep #2.mp3
-- mix10: ♡｜breakcore & dnb mix#4｜♡ - 1 hour of breakcore and dnb music.mp3
-- mix11: Atmosphere Chapter 2 - Deeper Drum And Bass (2007).mp3
-- mix12: Outland Echoes： Atmospheric DnB Mix - [Ambient, DnB, Jungle].mp3
-- mix13: a underrated breakcore mix w⧸ transitions.mp3
-- mix14: Intelligent Drum & Bass Dreamscapes [90's DnB].mp3
-- mix15: Atmospheric ”breakcore”⧸dnb mix.mp3
-- mix16: Breakcore mix for Dissociating.mp3
-- mix17: ambient breakcore⧸dnb mix to chill to.mp3
-- mix18: 90s Atmospheric Jungle & DnB - Vol. 8 (90s jungle, ambient, jazzy, intelligent dnb mix).mp3
-- mix19: 90s Atmospheric Jungle & DnB - Vol. 9 (90s jungle, ambient, jazzy, intelligent dnb mix).mp3
-- mix20: 2 0 0 7 ｜ Breakcore & Atmospheric dnb.mp3
-- mix21: atmospheric drum and bass compilation that will make you go ⋐(◉▾◉)⋑.mp3
-- mix22: chill breakcore songs to fall asleep listening to.mp3
-- mix23: breakcore mix to [insert activity] to.mp3
-- mix24: Atmospheric dnb mix - AMPRODUCER001 Feature Mix by DJ Stunna.mp3
-- mix25: Paul Allen's Mix • [Ambient Jungle⧸DnB Mix].mp3
-- mix26: 8492 ｜ Chill Breakcore and Surge Mix #3.mp3
-- mix27: mix of underrated breakcore⧸dnb songs.mp3
-```
+### Scraping audio from YouTube:
+
+1. Ensure that this is your current working directory: `audio-diffusion/data/`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Append any new youtube links to: `./links/yt_links.txt`
+4. Run: `./scrape_yt.sh`
+5. Raw mp3 data will be saved to: `./training_data/raw_audio/youtube_audio/`
+
+---
+
+### Processing YouTube audio into mel-spectrograms:
+
+1. Ensure that this is your current working directory: `audio-diffusion/data/`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run: `./process_yt.sh`
+4. Mel-spectrograms processed from all the youtube mp3 data will be saved to: `./training_data/processed_audio/youtube_processed/`
+
+---
 
 ## TODO
-- scrape harder (for example, download all the mixes of a particular series)
 - scraping pipeline for soundcloud
+- scrape harder (for example, download all the mixes of a particular series)
+- use spreadsheet to record collected track links and their respective runtimes (goal is ~500 hours)
