@@ -12,21 +12,10 @@ from train.config import *
 Prepare objects for training loop
 """
 
-def prepare_vae():
-    # match correct run names
-    if task == "butterfly":
-        config = SmithsonianButterflyTrainingConfig()
-        model = unet_ddpm_smithsonian_butterfly(config)
-        data_key = "image"
-    elif task == "cifar10":
-        config = CIFAR10TrainingConfig()
-        model = unet_ddpm_cifar10(config)
-        data_key = "img"
-    else:
-        raise ValueError(f"No config for `{task}`")
+def prepare_vae(output_dir, scheduler):
 
+    config = VAESpectrogramUNetTrainingConfig()
     # subset training data if needed
-    config.n_subset = n_subset
     config.output_dir = output_dir
 
     # transform functions
@@ -39,12 +28,6 @@ def prepare_vae():
     # load data
     print(config.dataset_name)
     dataset = load_dataset(config.dataset_name, split="train")
-
-    # if subset size given, subset the dataset
-    if config.n_subset is not None:
-        dataset = dataset.shuffle(seed=config.seed).select(range(config.n_subset))
-        config.run_name += f"-{config.n_subset}"
-        config.hub_model_id += f"-{config.n_subset}"
 
     dataset.set_transform(transform)
     train_dataloader = torch.utils.data.DataLoader(

@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 import torch
 import wandb
 
-from utils.utils import *
+#from utils.utils import *
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -17,13 +17,6 @@ import os
 
 import torch.nn.functional as F
 
-
-def get_checkpoint_path(config, step):
-    checkpoint_path = os.path.join(
-        config.output_dir,
-        config.run_name + f"-checkpoints/checkpoint-{step}"
-    )
-    return checkpoint_path
 
 
 def train_loop_ddpm(config, model, noise_scheduler, optimizer, train_dataloader, lr_scheduler, checkpoint_step=None):
@@ -69,23 +62,17 @@ def train_loop_ddpm(config, model, noise_scheduler, optimizer, train_dataloader,
         progress_bar = tqdm(total=len(train_dataloader), disable=not accelerator.is_local_main_process)
         progress_bar.set_description(f"Epoch {epoch}")
 
-        # reset checkpointing every epoch
-        do_checkpoint = True
-
         for step, batch in enumerate(train_dataloader):
             clean_images = batch["images"]
             # Sample noise to add to the images
             noise = torch.randn(clean_images.shape, device=clean_images.device)
             bs = clean_images.shape[0]
 
-            # Sample a random timestep for each image
             timesteps = torch.randint(
                 0, noise_scheduler.config.num_train_timesteps, (bs,), device=clean_images.device,
                 dtype=torch.int64
             )
 
-            # Add noise to the clean images according to the noise magnitude at each timestep
-            # (this is the forward diffusion process)
             noisy_images = noise_scheduler.add_noise(clean_images, noise, timesteps)
 
             with accelerator.accumulate(model):
@@ -119,7 +106,7 @@ def train_loop_ddpm(config, model, noise_scheduler, optimizer, train_dataloader,
 
                 out_path = os.path.join(
                     config.output_dir,
-                    config.run_name # + tag
+                    config.run_name
                 )
 
                 pipeline.save_pretrained(out_path)
@@ -132,9 +119,8 @@ def train_loop_ddpm(config, model, noise_scheduler, optimizer, train_dataloader,
                         ignore_patterns=["step_*", "epoch_*"],
                     )
 
-            if (epoch + 1) % config.save_checkpoint_epochs and do_checkpoint:
+            if (epoch + 1) % config.save_checkpoint_epochs:
                 # turn off for this epoch
-                do_checkpoint = False
                 # save as end of previous global step
                 checkpoint_path = get_checkpoint_path(config, global_step)
                 accelerator.save_state(checkpoint_path)
