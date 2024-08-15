@@ -6,7 +6,7 @@ from torchvision import transforms
 @dataclass
 class VAESpectrogramUNetTrainingConfig:
     image_size = 32  # the generated image resolution
-    batch_size = 64
+    batch_size = 8
 
     num_epochs = 200
     num_global_epochs = 2000 # total passes over dataset
@@ -25,6 +25,7 @@ class VAESpectrogramUNetTrainingConfig:
     transforms = [
         transforms.ToTensor(),
         transforms.Normalize([0.5], [0.5]),
+        transforms.Grayscale()
     ]
 
     push_to_hub = False

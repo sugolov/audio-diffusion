@@ -20,12 +20,15 @@ class RunHandler:
     TODO: handle run naming better
     """
 
-    def __init__(self, output_dir, data_dir, checkpoint, scheduler, config=None, run_name="vae"):
+    def __init__(self, output_dir, data_dir, checkpoint_step, scheduler, config, run_name=None):
         self.output_dir = output_dir
         self.data_dir = data_dir
-        self.checkpoint = checkpoint
+        self.checkpoint_step = checkpoint_step
         self.scheduler = scheduler
         self.config = config
+
+        if run_name is not None:
+            self.config.run_name = run_name
 
     def prepare(self):
         pass
@@ -33,11 +36,11 @@ class RunHandler:
     def get_dataloader(self, column="image"):
 
         dataset = load_dataset("imagefolder", data_dir=self.data_dir, split="train")
-
+        dataset = dataset.select(range(16))
         preprocess = transforms.Compose(self.config.transforms)
 
         def transform(examples):
-            images = [preprocess(image.convert("RGB")) for image in examples[column]]
+            images = [preprocess(image.convert("RGB")) for image in examples["image"]]
             return {"images": images}
 
         dataset.set_transform(transform)
@@ -49,13 +52,26 @@ class RunHandler:
         )
         return train_dataloader
 
+    def get_global_step(self):
+        return self.checkpoint_step if self.checkpoint_step else 0
+
+    def get_output_path(self):
+        """
+        :param step: step to format for
+        :return: current checkpoint, if no step, otherwise format with step
+        """
+        return os.path.join(self.output_dir, self.config.run_name)
+
     def get_checkpoint_path(self, step=None):
         """
         :param step: step to format for
         :return: current checkpoint, if no step, otherwise format with step
         """
-        step = step if step is not None else self.checkpoint
-        return os.path.join(self.output_dir, self.run_name + f"-checkpoints/checkpoint-{step}")
+        step = step if step is not None else self.checkpoint_step
+        if step is None:
+            raise ValueError("step not passed")
+        return os.path.join(self.get_output_path(), f"step_{step}")
+
 
     def get_scheduler(self, optimizer, global_train_steps=None):
         if self.scheduler == "constant":
@@ -80,12 +96,13 @@ class RunHandler:
 
 
 class VAERunHandler(RunHandler):
-    def __init__(self, output_dir, data_dir, checkpoint, scheduler, run_name, *args, **kwargs):
+    def __init__(self, output_dir, data_dir, checkpoint_step, scheduler, run_name=None, *args, **kwargs):
         config =  VAESpectrogramUNetTrainingConfig()
-        super().__init__(output_dir, data_dir, checkpoint, scheduler, config, run_name)
+
+        super().__init__(output_dir, data_dir, checkpoint_step, scheduler, config, run_name)
 
     def prepare(self):
-        from model.config import vae_spectrogram
+        from model.presets import vae_spectrogram
         print(self.config)
         train_dataloader = self.get_dataloader(self.config.transforms)
         model = vae_spectrogram(self.config)
