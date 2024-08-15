@@ -12,12 +12,9 @@ from train.config import VAESpectrogramUNetTrainingConfig
 Will be useful in the future!
 """
 
-
 class RunHandler:
     """
     Directory and config handling for methods that show up in training loops
-
-    TODO: handle run naming better
     """
 
     def __init__(self, output_dir, data_dir, checkpoint_step, scheduler, config, run_name=None):
@@ -98,11 +95,13 @@ class RunHandler:
 
 class VAERunHandler(RunHandler):
     def __init__(self, output_dir, data_dir, checkpoint_step, scheduler, run_name=None, *args, **kwargs):
+        # TODO: handle config specification
         config = VAESpectrogramUNetTrainingConfig()
 
         super().__init__(output_dir, data_dir, checkpoint_step, scheduler, config, run_name)
 
     def prepare(self):
+        # TODO: handle model presets
         from model.presets import vae_spectrogram
 
         train_dataloader = self.get_dataloader(self.config.transforms)
