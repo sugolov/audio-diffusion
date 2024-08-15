@@ -34,20 +34,4 @@ if args.vae:
 
 # TODO: cleanup
 elif args.ddpm:
-    # prepare and run train loop
-    config, train_dataloader, model, noise_scheduler, optimizer, lr_scheduler = prepare_ddpm(
-        task=args.run_task,
-        n_subset=args.n_subset,
-        output_dir=args.out,
-        scheduler=args.scheduler
-    )
-
-    train_loop_ddpm(
-        config=config,
-        train_dataloader=train_dataloader,
-        model=model,
-        noise_scheduler=noise_scheduler,
-        optimizer=optimizer,
-        lr_scheduler=lr_scheduler,
-        checkpoint_step=args.checkpoint
-    )
+    pass
