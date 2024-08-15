@@ -1,9 +1,8 @@
 import argparse
 
-from train.prepare import prepare_ddpm
 from train.loops import train_loop_ddpm, train_loop_vae
 
-parser = argparse.ArgumentParser(description="slurm training arg parser")
+parser = argparse.ArgumentParser(description="Training arg parser")
 
 # specify training of either vae or ddpm
 parser.add_argument("--vae", action="store_true", default="False")
@@ -24,12 +23,18 @@ parser.add_argument("--checkpoint_step", action="store", type=int)
 parser.add_argument("--scheduler",  action="store", type=str, default="constant")
 
 args = parser.parse_args()
+vargs = vars(args)
 
 from train.handler import VAERunHandler
 
+def start_message():
+    print("Starting training with")
+    [print(f"{arg}: {vargs[arg]}") for arg in vargs]
+    print("\n")
+
 if args.vae:
-    print(vars(args))
-    handler = VAERunHandler(**vars(args))
+    start_message()
+    handler = VAERunHandler(**vargs)
     train_loop_vae(handler, *handler.prepare())
 
 # TODO: cleanup

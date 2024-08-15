@@ -97,19 +97,18 @@ class RunHandler:
 
 class VAERunHandler(RunHandler):
     def __init__(self, output_dir, data_dir, checkpoint_step, scheduler, run_name=None, *args, **kwargs):
-        config =  VAESpectrogramUNetTrainingConfig()
+        config = VAESpectrogramUNetTrainingConfig()
 
         super().__init__(output_dir, data_dir, checkpoint_step, scheduler, config, run_name)
 
     def prepare(self):
         from model.presets import vae_spectrogram
-        print(self.config)
+
         train_dataloader = self.get_dataloader(self.config.transforms)
         model = vae_spectrogram(self.config)
         optimizer = torch.optim.AdamW(model.parameters(), lr=self.config.lr)
 
         global_train_steps = self._get_global_steps(len(train_dataloader))
-
         lr_scheduler = self.get_scheduler(optimizer, global_train_steps)
 
         return self.config, train_dataloader, model, optimizer, lr_scheduler
