@@ -34,8 +34,9 @@ class RunHandler:
         pass
 
     def get_dataloader(self, column="image"):
-
         dataset = load_dataset("imagefolder", data_dir=self.data_dir, split="train")
+
+        # TODO: REMOVE OUTSIDE OF TEST MODE
         dataset = dataset.select(range(16))
         preprocess = transforms.Compose(self.config.transforms)
 
