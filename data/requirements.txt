@@ -1,3 +1,4 @@
-yt-dlp==2024.8.6
-librosa=0.10.2.post1
-numpy=2.0.1
+librosa
+numpy
+yt-dlp
+selenium
