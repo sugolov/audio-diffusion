@@ -61,6 +61,14 @@ Scripts for scraping, storing, and processing breakcore music from the internet.
 
 ---
 
+### Scrape Audio from Soundcloud
+
+1. Ensure that this is your current working directory: `audio-diffusion/data/`
+2. Install Chrome driver: https://developer.chrome.com/docs/chromedriver/downloads. Note it's path relative to the working directory
+3. Append any soundcloud links to `sc_links.txt`
+4. Install dependencies: `pip install -r requirements.txt`
+5. run `./scrape_sc.sh /path/to/chrome-driver`
+
 ## TODO
 - scraping pipeline for soundcloud
 - scrape harder (for example, download all the mixes of a particular series)
