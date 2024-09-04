@@ -69,7 +69,7 @@ Scripts for scraping, storing, and processing breakcore music from the internet.
 4. Append any soundcloud links to `sc_links.txt`
 5. run `./scrape_sc.sh /relative/path/to/chrome-driver`
 
---
+---
 
 ### Processing Soundcloud audio into mel-spectrograms
 
