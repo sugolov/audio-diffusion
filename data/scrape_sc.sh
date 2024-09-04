@@ -1,3 +1,5 @@
-#!/bin/zsh
+#!/bin/bash
 
-python ~/Python/audio-diffusion/data/src/soundcloud_scraper.py "$1" "links/sc_links.txt" --num_scrolls "$2"
+python3 ./src/soundcloud_scraper.py ./links/sc_links.txt $1 training_data/raw_audio/soundcloud_audio/ --processes 8
+
+#example : ../../../Downloads/chromedriver-linux64/chromedriver-linux64/chromedriver
