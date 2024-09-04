@@ -65,9 +65,18 @@ Scripts for scraping, storing, and processing breakcore music from the internet.
 
 1. Ensure that this is your current working directory: `audio-diffusion/data/`
 2. Install Chrome driver: https://developer.chrome.com/docs/chromedriver/downloads. Note it's path relative to the working directory
-3. Append any soundcloud links to `sc_links.txt`
-4. Install dependencies: `pip install -r requirements.txt`
-5. run `./scrape_sc.sh /path/to/chrome-driver`
+3. Install dependencies: `pip install -r requirements.txt`
+4. Append any soundcloud links to `sc_links.txt`
+5. run `./scrape_sc.sh /relative/path/to/chrome-driver`
+
+--
+
+### Processing Soundcloud audio into mel-spectrograms
+
+1. Ensure that this is your current working directory: `audio-diffusion/data/`
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run: `./process_sc.sh`
+4. Mel-spectrograms processed from all the youtube mp3 data will be saved to: `./training_data/processed_audio/soundcloud_processed/`
 
 ## TODO
 - scraping pipeline for soundcloud
