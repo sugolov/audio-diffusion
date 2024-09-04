@@ -3,8 +3,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-import argparse
 import time
 import os
 import yt_dlp as youtube_dl
@@ -96,7 +94,7 @@ def main():
         for link in links:
             file.write(link + '\n')
 
-    print(f'Scraped {len(links)} links for tag "{tag}" and saved them to {args.output_file}')
+    print(f'Scraped {len(links)} links for tag "{tag}" and saved them to {args.output_dir}')
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
     with open(args.input_file, 'r') as file:
