@@ -17,6 +17,8 @@ import os
 
 import torch.nn.functional as F
 
+# TODO: make minimal training loops
+
 
 def train_loop_vae(handler, config, train_dataloader, model, optimizer, lr_scheduler):
     # Initialize accelerator and logging
