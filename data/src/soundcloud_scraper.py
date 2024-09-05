@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -11,7 +13,10 @@ from multiprocessing import Pool
 
 def scrape_soundcloud_links(tag, num_scrolls, path_to_chrome_driver):
     options = Options()
-    options.headless = False  # Change to True if you want to run in headless mode
+    options.add_argument("--headless") # run in headless env
+    options.add_argument("--no-sandbox") # do not sandbox chrome 
+    options.add_argument("--disable-dev-shm-usage") # prevent issues with shared memory
+
     service = Service(path_to_chrome_driver)
     driver = webdriver.Chrome(service=service, options=options)
 
