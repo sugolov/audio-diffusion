@@ -1,21 +1,29 @@
 #!/usr/bin/env python3
 
+import os
+import time
+import argparse
+from multiprocessing import Pool
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
-import time
-import os
 import yt_dlp as youtube_dl
-import argparse
-from multiprocessing import Pool
 
 def scrape_soundcloud_links(tag, num_scrolls, path_to_chrome_driver):
+    """
+    Scrape SoundCloud links based on a given tag.
+    
+    :param tag: The tag to search for on SoundCloud
+    :param num_scrolls: Number of times to scroll the page
+    :param path_to_chrome_driver: Path to the Chrome driver executable
+    :return: A set of unique SoundCloud track URLs
+    """
     options = Options()
-    options.add_argument("--headless") # run in headless env
-    options.add_argument("--no-sandbox") # do not sandbox chrome 
-    options.add_argument("--disable-dev-shm-usage") # prevent issues with shared memory
+    options.add_argument("--headless")  # Run in headless environment
+    options.add_argument("--no-sandbox")  # Do not sandbox Chrome
+    options.add_argument("--disable-dev-shm-usage")  # Prevent issues with shared memory
 
     service = Service(path_to_chrome_driver)
     driver = webdriver.Chrome(service=service, options=options)
@@ -31,12 +39,12 @@ def scrape_soundcloud_links(tag, num_scrolls, path_to_chrome_driver):
 
     for _ in range(num_scrolls):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(5)  # Increase this if content loads slowly
+        time.sleep(5)  # Wait for content to load
 
         new_height = driver.execute_script("return document.body.scrollHeight")
         if new_height == previous_height:
             retries += 1
-            if retries > 5:  # If the page height hasn't changed after 5 tries, stop
+            if retries > 5:  # Stop if no new content after 5 tries
                 print("No more content to load, stopping...")
                 break
         else:
@@ -54,13 +62,25 @@ def scrape_soundcloud_links(tag, num_scrolls, path_to_chrome_driver):
     return links
 
 def download_soundcloud_track(track_url, download_folder):
+    """
+    Download a SoundCloud track.
+    
+    :param track_url: URL of the track to download
+    :param download_folder: Folder to save the downloaded track
+    """
     # Extract the artist name and song name from the URL
     url_parts = track_url.strip().split('/')
     artist_name = url_parts[-2]
     song_name = url_parts[-1]
 
-    # Construct the output template to save the file as "song_name - artist_name.mp3"
+    # Construct the output template
     output_template = os.path.join(download_folder, f'{song_name} - {artist_name}.%(ext)s')
+
+    # Check if the file already exists
+    existing_files = [f for f in os.listdir(download_folder) if f.startswith(f'{song_name} - {artist_name}')]
+    if existing_files:
+        print(f"Skipping download for {track_url}: File already exists")
+        return
 
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -81,29 +101,36 @@ def download_soundcloud_track(track_url, download_folder):
         print(f"Failed to download {track_url}: {e}")
 
 def main():
-    parser = argparse.ArgumentParser(description="Scrape SoundCloud breakcore tracks based on a tag.")
+    parser = argparse.ArgumentParser(description="Scrape and download SoundCloud tracks based on a tag.")
     parser.add_argument('input_file', type=str,
                         help="The file to save the scraped links to (e.g., 'breakcore_links.txt')")
     parser.add_argument('chrome_driver_path', type=str,
-                        help="relative path to the chrome driver")
-    parser.add_argument('output_dir', type = str , help = "path to where the mp3 files will be saved")
-    parser.add_argument('--processes', type = int, default = 6, help = "number of download processes")
+                        help="Relative path to the chrome driver")
+    parser.add_argument('output_dir', type=str, help="Path to where the mp3 files will be saved")
+    parser.add_argument('--processes', type=int, default=6, help="Number of download processes")
     tag = 'breakcore'
     num_scrolls = 15
     args = parser.parse_args()
 
-    links = scrape_soundcloud_links(tag, num_scrolls, args.chrome_driver_path)
-
-    # Save the links to the specified file
-    with open(args.input_file, 'w') as file:
-        for link in links:
-            file.write(link + '\n')
-
-    print(f'Scraped {len(links)} links for tag "{tag}" and saved them to {args.output_dir}')
+    # Create output directory if it doesn't exist
     if not os.path.exists(args.output_dir):
         os.makedirs(args.output_dir)
+
+    # Scrape links if the input file doesn't exist
+    if not os.path.exists(args.input_file):
+        links = scrape_soundcloud_links(tag, num_scrolls, args.chrome_driver_path)
+        with open(args.input_file, 'w') as file:
+            for link in links:
+                file.write(link + '\n')
+        print(f'Scraped {len(links)} links for tag "{tag}" and saved them to {args.input_file}')
+    else:
+        print(f'Using existing links from {args.input_file}')
+
+    # Read links from the input file
     with open(args.input_file, 'r') as file:
         links = [link.strip() for link in file.readlines() if link.strip()]
+
+    # Download tracks using multiple processes
     with Pool(processes=args.processes) as pool:
         pool.starmap(download_soundcloud_track, [(link, args.output_dir) for link in links])
 
