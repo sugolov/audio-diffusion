@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
 import os
-import subprocess
-import numpy as np
-import librosa
-from concurrent.futures import ProcessPoolExecutor, as_completed
 import shutil
+import argparse
+import subprocess
+import librosa
+import numpy as np
+from typing import List, Optional
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
-def run_ffmpeg(command):
+def run_ffmpeg(command: List[str]) -> str:
     try:
         result = subprocess.run(command, check=True, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
         return result.stdout.decode()
@@ -15,13 +17,13 @@ def run_ffmpeg(command):
         print(f"error running ffmpeg command: {e.stderr.decode()}")
         raise
 
-# split raw mp3 file into standardized and normalized 30s wav segments
-def mp3_to_wav_segments(input_file, output_dir, segment_length=30):
-    base_name = os.path.splitext(os.path.basename(input_file))[0] # get track's base name
-    temp_dir = os.path.join(output_dir, 'temp', base_name) 
-    os.makedirs(temp_dir, exist_ok=True) # make directory for temporary files
-    temp_wav = os.path.join(temp_dir, f"{base_name}_temp.wav") # temporary wav file
-    normalized_wav = os.path.join(temp_dir, f"{base_name}_norm.wav") # temporary normalized wav file
+# split raw mp3 file into standardized and normalized wav segments
+def mp3_to_wav_segments(input_file: str, output_dir: str, segment_length: float = 0.5) -> List[str]:
+    base_name = os.path.splitext(os.path.basename(input_file))[0]
+    temp_dir = os.path.join(output_dir, 'temp', base_name)
+    os.makedirs(temp_dir, exist_ok=True)
+    temp_wav = os.path.join(temp_dir, f"{base_name}_temp.wav")
+    normalized_wav = os.path.join(temp_dir, f"{base_name}_norm.wav")
 
     try:
         # convert raw mp3 audio to wav and resample at 44.1kHz
@@ -44,7 +46,7 @@ def mp3_to_wav_segments(input_file, output_dir, segment_length=30):
 
         # split normalized wav file into 30s segments
         print(f"splitting wav into segments: {normalized_wav}")
-        segment_length_str = f"00:00:{segment_length}"
+        segment_length_str = f"{segment_length:.3f}"
         run_ffmpeg([
             'ffmpeg', '-i', normalized_wav, 
             '-f', 'segment',  
@@ -61,7 +63,7 @@ def mp3_to_wav_segments(input_file, output_dir, segment_length=30):
         raise
 
 # create mel-spectrograms from a wav segment
-def create_mel_spectrogram(audio_file, output_dir):
+def create_mel_spectrogram(audio_file: str, output_dir: str) -> str:
     try:
         y, sr = librosa.load(audio_file, sr=44100)
         mel_spectrogram = librosa.feature.melspectrogram(y=y, sr=sr)
@@ -77,17 +79,17 @@ def create_mel_spectrogram(audio_file, output_dir):
         raise
 
 # check if a track has already been processed
-def is_track_processed(input_file, output_dir):
+def is_track_processed(input_file: str, output_dir: str) -> bool:
     base_name = os.path.splitext(os.path.basename(input_file))[0]
     track_output_dir = os.path.join(output_dir, base_name)
     
-    # Check if the output directory for this track exists and contains at least one mel-spectrogram
+    # check if the output directory for this track exists and contains at least one mel-spectrogram
     if os.path.exists(track_output_dir):
         mel_spectrograms = [f for f in os.listdir(track_output_dir) if f.endswith('_mel.npy')]
         return len(mel_spectrograms) > 0
 
 # end to end audio processing from mp3 to mel-spectrograms
-def process_audio_file(input_file, output_dir, segment_length=30):
+def process_audio_file(input_file: str, output_dir: str, segment_length: float = 0.5) -> None:
     base_name = os.path.splitext(os.path.basename(input_file))[0]
     track_output_dir = os.path.join(output_dir, base_name)
     temp_dir = os.path.join(output_dir, 'temp', base_name)
@@ -118,7 +120,7 @@ def process_audio_file(input_file, output_dir, segment_length=30):
             shutil.rmtree(temp_dir)
 
 # handle all mp3 tracks in a directory concurrently 
-def process_dir(input_dir, output_dir):
+def process_dir(input_dir: str, output_dir: str, segment_length: float = 0.5) -> None:
     # create output if it doesn't yet exist
     if not os.path.exists(output_dir):
         os.makedirs(output_dir) 
@@ -128,7 +130,7 @@ def process_dir(input_dir, output_dir):
     
     # concurrently process the list of mp3 files
     with ProcessPoolExecutor() as executor:
-        futures = [executor.submit(process_audio_file, os.path.join(input_dir, audio_file), output_dir) for audio_file in audio_files]
+        futures = [executor.submit(process_audio_file, os.path.join(input_dir, audio_file), output_dir, segment_length) for audio_file in audio_files]
         for future in as_completed(futures):
             try:
                 future.result()  # re-raise any exceptions that occurred in the worker process
@@ -137,12 +139,11 @@ def process_dir(input_dir, output_dir):
 
 # driver program
 if __name__ == "__main__":
-    import argparse
-    
     parser = argparse.ArgumentParser(description="Process audio files: convert to WAV, normalize, segment, and create mel-spectrograms.")
     parser.add_argument("input_dir", help="Directory containing mp3 audio files")
     parser.add_argument("output_dir", help="Directory to save processed mel-spectrograms")
+    parser.add_argument("--segment_length", type=float, default=0.5, help="Specify WAV/mel-spectrogram segment length in seconds (default: 0.5)")
     
     args = parser.parse_args()
     
-    process_dir(args.input_dir, args.output_dir)
+    process_dir(args.input_dir, args.output_dir, args.segment_length)
