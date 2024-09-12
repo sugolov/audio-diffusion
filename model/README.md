@@ -1,0 +1,1 @@
+Llama DiT and MMDiT models are originally implemented by Simo Ryu: https://github.com/cloneofsimo/minRF 
