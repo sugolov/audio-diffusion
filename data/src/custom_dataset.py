@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, Sampler, DataLoader
 from torch import Tensor
-from typing import List, Tuple, Dict, Iterator
+from typing import List, Tuple, Iterator
 
 """ custom dataset for spectrograms that includes track information """
 class AudioTrackDataset(Dataset):
@@ -150,10 +150,12 @@ def main():
             print(f"    Track: {track_idx}")
             print(f"      number of spectrograms: {len(track_spectrograms)}")
             print(f"      shape of spectrograms: {track_spectrograms.shape}")
+            """
             print(f"      actual (non-paddded) shapes:")
-            for spec, mask in zip(track_spectrograms, track_actual_masks):
+            for _, mask in zip(track_spectrograms, track_actual_masks):
                 actual_shape = mask.sum(dim=(1,2)).tolist()
                 print(f"        {actual_shape}")
+            """
 
     # print info about a few individual tracks
     print("\nIndividual track info")

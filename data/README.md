@@ -10,34 +10,34 @@ Scripts for scraping, storing, and processing breakcore music from the internet.
 └── training_data/
     ├── raw_audio/
     │   ├── youtube_audio/
-    │   │   ├── track1.mp3
-    │   │   ├── track2.mp3
+    │   │   ├── yt_track1.mp3
+    │   │   ├── yt_track2.mp3
     │   │   ├── ...
-    │   │   └── track_n.mp3
+    │   │   └── yt_track_n.mp3
     │   └── soundcloud_audio/
-    │       ├── track1.mp3
-    │       ├── track2.mp3
+    │       ├── sc_track1.mp3
+    │       ├── sc_track2.mp3
     │       ├── ...
-    │       └── track_n.mp3
+    │       └── sc_track_n.mp3
     └── processed_audio/
         ├── youtube_processed/
-        │   ├── track1/
-        │   │   ├── spectrogram_00.npy
-        │   │   ├── spectrogram_01.npy
+        │   ├── yt_track1/
+        │   │   ├── yt_track1_000_mel.npy
+        │   │   ├── yt_track1_001_mel.npy
         │   │   ├── ...
-        │   │   └── spectrogram_xx.npy
-        │   ├── track2/
+        │   │   └── yt_track1_xxx_mel.npy
+        │   ├── yt_track2/
         │   ├── ...
-        │   └── track_n/
+        │   └── yt_track_n/
         └── soundcloud_processed/
-            ├── track1/
-            │   ├── spectrogram_00.npy
-            │   ├── spectrogram_01.npy
+            ├── sc_track1/
+            │   ├── sc_track1_000_mel.npy
+            │   ├── sc_track1_001_mel.npy
             │   ├── ...
-            │   └── spectrogram_xx.npy
-            ├── track2/  
+            │   └── sc_track1_xxx_mel.npy
+            ├── sc_track2/  
             ├── ...
-            └── track_n/
+            └── sc_track_n/
 ```
 
 ---
