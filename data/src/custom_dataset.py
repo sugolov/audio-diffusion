@@ -112,8 +112,9 @@ class TrackBatchSampler(Sampler):
 
 """ driver program to test dataset functionality """
 def main():
-    root_dir = "../training_data/processed_audio/"
-    dataset = AudioTrackDataset(root_dir)
+    data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../training_data/processed_audio/")
+
+    dataset = AudioTrackDataset(data_dir)
     sampler = TrackBatchSampler(dataset, batch_size=32)
     dataloader = DataLoader(
         dataset, 
@@ -125,17 +126,29 @@ def main():
     print(f"total number of spectrograms: {len(dataset)}")
     print(f"total number of tracks: {len(dataset.tracks)}")
 
+
+    # print info about a few individual tracks
+    first_i_tracks = 3
+    print("\n---------------------------------------------------------")
+    print("Track Information:\n")
+    for i in range(min(first_i_tracks, len(dataset.tracks))):
+        print(f"TRACK_{i+1}")
+        print(f"  source: {dataset.tracks[i][0]}")
+        print(f"  name: {dataset.tracks[i][1]}")
+        print(f"  number of spectrograms: {dataset.track_lengths[i]}")
+    print("\n---------------------------------------------------------\n")
+
+    print("Batch Information:")
     # loop through a few batches
     for batch_idx, (batch_spectrograms, batch_masks, batch_track_indices) in enumerate(dataloader):
-        if batch_idx >= 5: # only print for the first 5 batches
+        if batch_idx >= first_i_tracks: # only print for the first {i} batches
             break
 
         print(f"\nBATCH_{batch_idx+1}")
         print(f"  batch shape: {batch_spectrograms.shape}")
         print(f"  mask shape: {batch_masks.shape}")
         print(f"  number of spectrograms in batch: {len(batch_spectrograms)}")
-        print(f"  shape of first spectrogram in batch: {batch_spectrograms[0].shape}")
-        print(f"  shape of last spectrogram in batch: {batch_spectrograms[-1].shape}")
+        print(f"  shape of individual spectrogram: {batch_spectrograms[0].shape}")
 
         # count unique tracks in this batch
         unique_tracks = torch.unique(batch_track_indices).tolist()
@@ -157,13 +170,6 @@ def main():
                 print(f"        {actual_shape}")
             """
 
-    # print info about a few individual tracks
-    print("\nIndividual track info")
-    for i in range(min(5, len(dataset.tracks))):
-        print(f"TRACK_{i}")
-        print(f"  source: {dataset.tracks[i][0]}")
-        print(f"  name: {dataset.tracks[i][1]}")
-        print(f"  number of spectrograms: {dataset.track_lengths[i]}")
 
 if __name__ == "__main__":
     main()
